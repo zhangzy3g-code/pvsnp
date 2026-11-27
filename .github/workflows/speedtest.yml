@@ -1,0 +1,33 @@
+name: lean-speedtest
+on:
+  push:
+    branches: [speedtest-actions]
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan + Lean v4.36.0
+        run: |
+          curl -sSfL https://elan.lean-lang.org | sh -s -- -y --default-toolchain leanprover/lean4:v4.36.0
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Cache .lake
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: lake-v1-${{ runner.os }}-${{ hashFiles('lake-manifest.json', 'lean-toolchain') }}
+      - name: Mathlib cache get
+        run: lake exe cache get
+      - name: Build libraries (PvsNP + CookLevin)
+        run: lake build PvsNP CookLevin
+      - name: Check (a) full import Mathlib
+        run: |
+          start=$(date +%s)
+          lake env lean PvsNP/Units/m3_clause_pad_split.lean
+          echo "A_FULL_WALL_SECONDS=$(( $(date +%s) - start ))"
+      - name: Check (b) no Mathlib root import
+        run: |
+          start=$(date +%s)
+          lake env lean Speedtest/b_noroot.lean
+          echo "B_NOROOT_WALL_SECONDS=$(( $(date +%s) - start ))"
