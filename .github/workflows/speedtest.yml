@@ -10,7 +10,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install elan + Lean v4.36.0
         run: |
-          curl -sSfL https://elan.lean-lang.org | sh -s -- -y --default-toolchain leanprover/lean4:v4.36.0
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan toolchain install leanprover/lean4:v4.36.0
+          elan default leanprover/lean4:v4.36.0
+          lake --version
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Cache .lake
         uses: actions/cache@v4
