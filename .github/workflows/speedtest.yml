@@ -35,3 +35,11 @@ jobs:
           start=$(date +%s)
           lake env lean Speedtest/b_noroot.lean
           echo "B_NOROOT_WALL_SECONDS=$(( $(date +%s) - start ))"
+      - name: Check regression-6 products (full imports)
+        run: |
+          for f in Regression6/m3_empty_clause_unsat.lean Regression6/m3_positive_clause_sat.lean Regression6/m3_negative_clause_sat.lean Regression6/m3_tautology_clause.lean Regression6/m3_pure_literal.lean Regression6/m3_equiv_literal_subst.lean; do
+            start=$(date +%s)
+            lake env lean "$f"
+            echo "REG6_PASS $f WALL_SECONDS=$(( $(date +%s) - start ))"
+          done
+          echo "REG6_ALL_DONE"
