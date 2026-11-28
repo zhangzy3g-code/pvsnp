@@ -1,0 +1,53 @@
+name: lean-inplace-verify
+on:
+  push:
+    branches: [inplace-verify]
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan + Lean v4.36.0
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan toolchain install leanprover/lean4:v4.36.0
+          elan default leanprover/lean4:v4.36.0
+          lake --version
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Cache .lake
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: lake-v1-${{ runner.os }}-${{ hashFiles('lake-manifest.json', 'lean-toolchain') }}
+      - name: Mathlib cache get
+        run: lake exe cache get
+      - name: Build libraries (PvsNP + CookLevin)
+        run: lake build PvsNP CookLevin
+      - name: In-place verify units (module build + axiom check)
+        run: |
+          for f in InplaceVerify/*.lean; do
+            key=$(basename "$f" .lean)
+            cp "$f" "PvsNP/Units/$key.lean"
+            start=$(date +%s)
+            if lake build "+PvsNP.Units.$key" > "iv-$key.log" 2>&1; then
+              echo "INPLACE_PASS $key WALL_SECONDS=$(( $(date +%s) - start ))"
+              printf 'import PvsNP.Units.%s\n\n#print axioms PvsNP.Units.%s\n' "$key" "$key" > InplaceCheck.lean
+              if lake env lean InplaceCheck.lean > "ax-$key.log" 2>&1; then
+                cat "ax-$key.log"
+                if grep -q "sorryAx" "ax-$key.log"; then
+                  echo "AXIOM_FAIL $key"
+                else
+                  echo "AXIOM_PASS $key"
+                fi
+              else
+                echo "AXIOM_FAIL $key (axiom check file errored)"
+                tail -20 "ax-$key.log" || true
+              fi
+            else
+              echo "INPLACE_FAIL $key WALL_SECONDS=$(( $(date +%s) - start ))"
+              tail -30 "iv-$key.log" || true
+            fi
+          done
+          echo "INPLACE_ALL_DONE"
