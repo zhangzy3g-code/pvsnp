@@ -41,14 +41,15 @@ theorem PvsNP.Units.m3_blocked_clause :
           | false => rfl
           | true => exact absurd h3 h
       refine ⟨a', (evalCnf_clause_iff a' (C :: N)).mpr fun D hD => ?_⟩
-      rcases List.mem_cons.mp hD with rfl | hDN
-      · exact (evalClause_literal_iff a' C).mpr ⟨(pol, v), hlC, hforce⟩
+      rcases List.mem_cons.mp hD with hDC | hDN
+      · subst D
+        exact (evalClause_literal_iff a' C).mpr ⟨(pol, v), hlC, hforce⟩
       · have haD : evalClause a D = true := (evalCnf_clause_iff a N).mp ha D hDN
         by_cases hDl : (!pol, v) ∈ D
         · obtain ⟨m, hmC, hmne, hmD⟩ := hblocked D hDN hDl
           obtain ⟨ms, mv⟩ := m
           by_cases hmv : mv = v
-          · subst hmv
+          · subst mv
             have hms : ms = !pol := hBool (fun h => hmne (by rw [h]))
             have hlit : (!ms, v) = (pol, v) := by rw [hms, Bool.not_not]
             exact (evalClause_literal_iff a' D).mpr ⟨(!ms, v), hmD, by rw [hlit]; exact hforce⟩
@@ -60,7 +61,7 @@ theorem PvsNP.Units.m3_blocked_clause :
         · obtain ⟨m, hmD, hmtrue⟩ := (evalClause_literal_iff a D).mp haD
           obtain ⟨ms, mv⟩ := m
           by_cases hmv : mv = v
-          · subst hmv
+          · subst mv
             by_cases hms : ms = pol
             · subst hms
               exact (evalClause_literal_iff a' D).mpr ⟨(pol, v), hmD, hforce⟩
