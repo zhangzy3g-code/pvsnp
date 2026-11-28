@@ -72,3 +72,7 @@ theorem PvsNP.Units.m3_blocked_clause :
             simp only [evalLiteral] at hmtrue ⊢
             rw [hagree mv hmv]
             exact hmtrue
+
+#print axioms PvsNP.Units.m3_blocked_clause
+
+example : (1 : ℕ) = 2 := rfl
