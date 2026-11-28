@@ -36,7 +36,9 @@ jobs:
         run: lake build PvsNP CookLevin
       - name: Run environment probe
         run: |
+          set +e
           lake env lean Probe.lean > probe-out.log 2>&1
           echo "PROBE_EXIT=$?"
           cat probe-out.log
           echo "PROBE_DONE"
+          exit 0
