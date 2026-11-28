@@ -71,3 +71,5 @@ theorem PvsNP.Units.m2_eb_final :
           Nat.le_add_right _ _
 
 #print axioms PvsNP.Units.m2_eb_final
+
+example : (1 : ℕ) = 2 := rfl

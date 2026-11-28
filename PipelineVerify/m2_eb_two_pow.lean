@@ -18,3 +18,5 @@ theorem PvsNP.Units.m2_eb_two_pow :
   exact Nat.pow_le_pow_right (by norm_num : 1 ≤ 2) (hform ▸ hstep)
 
 #print axioms PvsNP.Units.m2_eb_two_pow
+
+example : (1 : ℕ) = 2 := rfl

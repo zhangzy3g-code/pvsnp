@@ -38,3 +38,5 @@ theorem PvsNP.Units.m2_eb_add :
         exact Nat.add_le_add_left hY _
 
 #print axioms PvsNP.Units.m2_eb_add
+
+example : (1 : ℕ) = 2 := rfl

@@ -26,3 +26,5 @@ theorem PvsNP.Units.m2_eb_mul :
         exact add_le_add (Nat.mul_le_mul_left A₁ h1) (Nat.mul_le_mul_left A₂ h2)
 
 #print axioms PvsNP.Units.m2_eb_mul
+
+example : (1 : ℕ) = 2 := rfl

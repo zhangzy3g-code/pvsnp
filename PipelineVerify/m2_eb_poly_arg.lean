@@ -45,3 +45,5 @@ theorem PvsNP.Units.m2_eb_poly_arg :
     _ = 2 ^ ((A * (S + 1) ^ D) * (n + 1) ^ (d * D)) := by rw [mul_assoc]
 
 #print axioms PvsNP.Units.m2_eb_poly_arg
+
+example : (1 : ℕ) = 2 := rfl
