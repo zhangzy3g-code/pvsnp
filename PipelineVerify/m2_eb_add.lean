@@ -36,3 +36,5 @@ theorem PvsNP.Units.m2_eb_add :
             = (A₁ + A₂) * (n + 1) ^ max D₁ D₂ + (n + 1) ^ max D₁ D₂ := by ring
         rw [hX]
         exact Nat.add_le_add_left hY _
+
+#print axioms PvsNP.Units.m2_eb_add

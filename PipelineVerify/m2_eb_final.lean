@@ -69,3 +69,5 @@ theorem PvsNP.Units.m2_eb_final :
           Nat.pow_le_pow_right (by norm_num) hkey
       _ ≤ 2 ^ (n ^ (2 ^ (A * 2 ^ D) + 2 * D)) + (2 ^ (A * 2 ^ D) + 2 * D) :=
           Nat.le_add_right _ _
+
+#print axioms PvsNP.Units.m2_eb_final

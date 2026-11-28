@@ -43,3 +43,5 @@ theorem PvsNP.Units.m2_eb_poly_arg :
         apply Nat.pow_le_pow_right (by norm_num : 1 ≤ 2)
         exact Nat.mul_le_mul_left A (hform ▸ hpow)
     _ = 2 ^ ((A * (S + 1) ^ D) * (n + 1) ^ (d * D)) := by rw [mul_assoc]
+
+#print axioms PvsNP.Units.m2_eb_poly_arg
