@@ -1,0 +1,62 @@
+name: lean-fixcheck
+on:
+  push:
+    branches: [inplace-verify]
+    paths:
+      - 'FixVerify/**'
+      - '.github/workflows/fixcheck.yml'
+  workflow_dispatch:
+jobs:
+  fixcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan + Lean v4.36.0
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan toolchain install leanprover/lean4:v4.36.0
+          elan default leanprover/lean4:v4.36.0
+          lake --version
+          lean --version
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Cache .lake
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: lake-v1-${{ runner.os }}-${{ hashFiles('lake-manifest.json', 'lean-toolchain') }}
+      - name: Mathlib cache get
+        run: lake exe cache get
+      - name: Build libraries (PvsNP + CookLevin)
+        run: lake build PvsNP CookLevin
+      - name: Full-log check of FixVerify files
+        run: |
+          for f in FixVerify/*.lean; do
+            key=$(basename "$f" .lean)
+            start=$(date +%s)
+            if lake env lean "$f" > "fx-$key.log" 2>&1; then
+              echo "FIX_PASS $key WALL_SECONDS=$(( $(date +%s) - start ))"
+            else
+              echo "FIX_FAIL $key WALL_SECONDS=$(( $(date +%s) - start ))"
+            fi
+            echo "----- BEGIN LOG $key -----"
+            cat "fx-$key.log"
+            echo "----- END LOG $key -----"
+          done
+          echo "FIX_ALL_DONE"
+      - name: Axiom check (appended copies)
+        run: |
+          for f in FixVerify/*.lean; do
+            key=$(basename "$f" .lean)
+            cp "$f" "ax-$key.lean"
+            printf '\n#print axioms PvsNP.Units.%s\n' "$key" >> "ax-$key.lean"
+            if lake env lean "ax-$key.lean" > "axlog-$key.log" 2>&1; then
+              echo "AXIOM_RUN_OK $key"
+            else
+              echo "AXIOM_RUN_FAIL $key"
+            fi
+            echo "----- BEGIN AXIOMS $key -----"
+            cat "axlog-$key.log"
+            echo "----- END AXIOMS $key -----"
+          done
+          echo "AXIOM_ALL_DONE"
