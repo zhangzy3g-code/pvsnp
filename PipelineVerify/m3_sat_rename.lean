@@ -1,5 +1,3 @@
--- [desk-auto instantiate] batch 20261128-122658 · template tpl02（tpl02_sat_rename.lean）
--- 题面与模板陈述逐字一致（空白规范化后比对），仅替换定理名；终验走私有 Actions 全量三行 import。
 /-
 模板 tpl02 — SAT 族：变量重命名下 SAT 不变（赋值双向传输）
 来源：pvsnp-repo/PvsNP/Units/m3_sat_rename.lean（本队证明；与 drafts/m3_sat_rename_check.lean 仅差 import 头一行）

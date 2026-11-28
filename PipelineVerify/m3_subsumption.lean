@@ -1,5 +1,3 @@
--- [desk-auto instantiate] batch 20261128-122658 · template tpl05（tpl05_sat_subsumption.lean）
--- 题面与模板陈述逐字一致（空白规范化后比对），仅替换定理名；终验走私有 Actions 全量三行 import。
 /-
 模板 tpl05 — SAT 族：子句删除（subsumption：被包含的子句可删）
 来源：pvsnp-repo/PvsNP/Units/m3_subsumption.lean（本队证明；与 drafts/m3_subsumption_check.lean 仅差 import 头一行）
