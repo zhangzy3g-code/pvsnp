@@ -63,7 +63,7 @@ theorem PvsNP.Units.m3_blocked_clause :
           by_cases hmv : mv = v
           · subst mv
             by_cases hms : ms = pol
-            · subst hms
+            · subst ms
               exact (evalClause_literal_iff a' D).mpr ⟨(pol, v), hmD, hforce⟩
             · have hms2 : ms = !pol := hBool hms
               rw [hms2] at hmD
