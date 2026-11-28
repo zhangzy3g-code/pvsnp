@@ -1,9 +1,9 @@
--- [desk-auto instantiate] batch 20261128-122658 · template tpl16（tpl16_conp_verifier_flip.lean）
--- 题面与模板陈述逐字一致（空白规范化后比对），仅替换定理名；终验走私有 Actions 全量三行 import。
 /-
 模板 tpl16 — 刻画族：coNP 的 ∀-验证器刻画（翻转 NP 验证器）
 来源：pvsnp-repo/PvsNP/Units/m2_conp_verifier_iff.lean（本队证明；与 drafts/m2_conp_verifier_iff_check.lean 仅差 import 头一行）
-编译状态：✅ 已结算文本。
+编译状态：⚠ 已结算文本在钉版 Lean v4.36.0 下不过（裸 `.mp/.mpr` 投影、cases 目标
+  generalize、simpa 三处构造问题）；2026-11-28 已按钉版修复并过 Actions 终验＋公理门，
+  见 desk-auto/TEMPLATE-FIX-20261128.md。陈述未动。
 填空点：① 翻转的等价（boolNotEquiv：输出字母表经 Bool 取反重解释，按编码换）；
   ② 证书界多项式 p 的沿用/换算；③ ∀/∃ 对偶的命题陈述式（x ∈ L ↔ ∀ w, |w| ≤ p(|x|) → V (x,w) = true）。
 引理链：ptc_not（同机器、同时间界、输出字母表 trans boolNotEquiv）→ 主定理双向各一次取反。
@@ -70,13 +70,13 @@ theorem statement : ∀ L : Language Bool, L ∈ PvsNP.coNP ↔
       by_contra hcon
       have hVtrue : V (x, w) = true := by
         cases hVw : V (x, w) with
-        | true => exact hVw
+        | true => rfl
         | false => simp [hVw] at hcon
       have hxc : x ∈ Lᶜ := (hspec x).mpr ⟨w, hw, hVtrue⟩
-      exact (Set.mem_compl_iff.mp hxc) hx
+      exact ((Set.mem_compl_iff L x).mp hxc) hx
     · intro hall
       by_contra hx
-      have hxc : x ∈ Lᶜ := Set.mem_compl_iff.mpr hx
+      have hxc : x ∈ Lᶜ := (Set.mem_compl_iff L x).mpr hx
       obtain ⟨w, hw, hVtrue⟩ := (hspec x).mp hxc
       have h1 := hall w hw
       simp [hVtrue] at h1
@@ -95,10 +95,12 @@ theorem statement : ∀ L : Language Bool, L ∈ PvsNP.coNP ↔
         cases hVw : V (x, w) with
         | true => exact absurd hVw hVfalse
         | false => simp [hVw]
-      exact (Set.mem_compl_iff.mp hxc) ((hspec x).mpr hall)
+      exact ((Set.mem_compl_iff L x).mp hxc) ((hspec x).mpr hall)
     · rintro ⟨w, hw, hVtrue⟩
       by_contra hx
-      have hxL : x ∈ L := by simpa [Set.mem_compl_iff] using hx
+      have hxL : x ∈ L := by
+        by_contra hxL'
+        exact hx ((Set.mem_compl_iff L x).mpr hxL')
       have h1 := (hspec x).mp hxL w hw
       simp [h1] at hVtrue
 

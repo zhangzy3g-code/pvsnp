@@ -1,10 +1,10 @@
--- [desk-auto instantiate] batch 20261128-122658 · template tpl17（tpl17_eb_bound_algebra.lean）
--- 题面与模板陈述逐字一致（空白规范化后比对），仅替换定理名；终验走私有 Actions 全量三行 import。
 /-
 模板 tpl17 — 界代数族：指数-多项式界在多项式求值下的闭包（纯 Mathlib 算术）
 来源：pvsnp-repo/PvsNP/Units/m2_eb_poly.lean（本队证明；与 drafts/m2_eb_poly_check.lean 仅差 import 头一行；
   草稿原只 import Mathlib，unit 形态补标准三行头）
-编译状态：✅ 已结算文本。
+编译状态：⚠ 已结算文本在钉版 Lean v4.36.0 下不过（eval_eq_sum_range 陈述漂移、
+  positivity 不认 1 ≤ · 目标、pow_mul 方向、omega 对 0^d 失效等）；2026-11-28 已按
+  钉版修复并过 Actions 终验＋公理门，见 desk-auto/TEMPLATE-FIX-20261128.md。陈述未动。
 填空点：① 界的形式（这里 f n ≤ 2 ^ (A * (n + 1) ^ D)，按题换指数基/形状）；
   ② 统一界 p.eval m ≤ C * (m ^ d + 1) 的取法（d = natDegree、C = 系数和）；
   ③ 最终常数合成（A' := d * A + C + 1、D' := D）。
@@ -37,10 +37,9 @@ theorem statement :
       by_cases hm : m = 0
       · subst hm
         have h0 : (0 : ℕ) ^ i ≤ 1 := by cases i <;> simp
-        have h1 : (0 : ℕ) ^ d + 1 ≥ 1 := by omega
+        have h1 : (0 : ℕ) ^ d + 1 ≥ 1 := Nat.le_add_left 1 _
         calc p.coeff i * (0 : ℕ) ^ i
             ≤ p.coeff i * 1 := Nat.mul_le_mul_left _ h0
-          _ = p.coeff i := Nat.mul_one _
           _ ≤ p.coeff i * ((0 : ℕ) ^ d + 1) :=
             Nat.mul_le_mul_left _ h1
       · have hm1 : 1 ≤ m := Nat.one_le_iff_ne_zero.mpr hm
@@ -50,8 +49,8 @@ theorem statement :
           _ ≤ p.coeff i * (m ^ d + 1) :=
             Nat.mul_le_mul_left _ (Nat.le_add_right _ _)
     calc p.eval m
-        = ∑ i ∈ Finset.range (d + 1), p.coeff i * m ^ i :=
-          Polynomial.eval_eq_sum_range
+        = ∑ i ∈ Finset.range (d + 1), p.coeff i * m ^ i := by
+          exact @Polynomial.eval_eq_sum_range ℕ _ p m
       _ ≤ ∑ i ∈ Finset.range (d + 1), p.coeff i * (m ^ d + 1) :=
           Finset.sum_le_sum hterm
       _ = C * (m ^ d + 1) := by rw [Finset.sum_mul]
@@ -60,12 +59,12 @@ theorem statement :
   set N := (n + 1) ^ D with hN
   set E := A * N with hE
   have hfE : f n ≤ 2 ^ E := hf n
-  have hN1 : 1 ≤ N := by rw [hN]; positivity
+  have hN1 : 1 ≤ N := Nat.one_le_pow D (n + 1) (Nat.succ_pos n)
   have hpow : (f n) ^ d ≤ 2 ^ (d * E) := by
     have h1 : (f n) ^ d ≤ (2 ^ E) ^ d := Nat.pow_le_pow_left hfE d
-    rwa [← pow_mul] at h1
+    rwa [← pow_mul'] at h1
   have h2 : (f n) ^ d + 1 ≤ 2 ^ (d * E + 1) := by
-    have hge : (1 : ℕ) ≤ 2 ^ (d * E) := by positivity
+    have hge : (1 : ℕ) ≤ 2 ^ (d * E) := Nat.one_le_pow (d * E) 2 (by norm_num)
     have hsucc : 2 ^ (d * E + 1) = 2 ^ (d * E) * 2 := pow_succ _ _
     omega
   have h3 : C * ((f n) ^ d + 1) ≤ 2 ^ (C + (d * E + 1)) := by
