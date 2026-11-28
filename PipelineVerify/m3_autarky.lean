@@ -46,3 +46,7 @@ theorem PvsNP.Units.m3_autarky :
       simp only [evalLiteral] at hmtrue ⊢
       rw [hagree_out mu hmu]
       exact hmtrue
+
+#print axioms PvsNP.Units.m3_autarky
+
+example : (1 : ℕ) = 2 := rfl
