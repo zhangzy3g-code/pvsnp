@@ -33,7 +33,10 @@ theorem PvsNP.Units.m2_eb_final :
     rw [zero_pow (Nat.ne_of_gt hpos)]
     calc f 0 ≤ 2 ^ A := hf0
       _ ≤ 2 ^ (A * 2 ^ D) := h2A
-      _ ≤ 2 ^ 0 + (2 ^ (A * 2 ^ D) + 2 * D) := Nat.le_add_left _ _
+      _ ≤ 2 ^ (A * 2 ^ D) + 2 * D := Nat.le_add_right _ _
+      _ ≤ 2 ^ 0 + (2 ^ (A * 2 ^ D) + 2 * D) := by
+          rw [pow_zero]
+          exact Nat.le_add_left _ _
   by_cases hn1 : n = 1
   · subst hn1
     have hf1 := hf' 1
@@ -65,4 +68,4 @@ theorem PvsNP.Units.m2_eb_final :
       _ ≤ 2 ^ (n ^ (2 ^ (A * 2 ^ D) + 2 * D)) :=
           Nat.pow_le_pow_right (by norm_num) hkey
       _ ≤ 2 ^ (n ^ (2 ^ (A * 2 ^ D) + 2 * D)) + (2 ^ (A * 2 ^ D) + 2 * D) :=
-          Nat.le_add_left _ _
+          Nat.le_add_right _ _

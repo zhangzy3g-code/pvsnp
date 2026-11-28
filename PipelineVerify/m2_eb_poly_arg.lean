@@ -22,7 +22,7 @@ theorem PvsNP.Units.m2_eb_poly_arg :
           apply Finset.sum_le_sum
           intro i hi
           apply Nat.mul_le_mul_left
-          have hi' : i ≤ d := Nat.lt_succ.mp (Finset.mem_range.mp hi)
+          have hi' : i ≤ d := Nat.le_of_lt_succ (Finset.mem_range.mp hi)
           calc n ^ i ≤ (n + 1) ^ i :=
                 Nat.pow_le_pow_left (Nat.le_add_right n 1) i
             _ ≤ (n + 1) ^ d :=
@@ -31,9 +31,9 @@ theorem PvsNP.Units.m2_eb_poly_arg :
   refine ⟨A * (S + 1) ^ D, d * D, fun n => ?_⟩
   have hq1 : q.eval n + 1 ≤ (S + 1) * (n + 1) ^ d := by
     have hY : 1 ≤ (n + 1) ^ d := Nat.one_le_pow _ _ (Nat.le_add_left 1 n)
-    calc q.eval n + 1 ≤ S * (n + 1) ^ d + 1 * (n + 1) ^ d := by
-          rw [one_mul]; exact Nat.add_le_add_right (hq n) _
-      _ = (S + 1) * (n + 1) ^ d := by rw [add_mul]
+    calc q.eval n + 1 ≤ S * (n + 1) ^ d + (n + 1) ^ d :=
+          Nat.add_le_add (hq n) hY
+      _ = (S + 1) * (n + 1) ^ d := by rw [add_mul, one_mul]
   have hpow : (q.eval n + 1) ^ D ≤ ((S + 1) * (n + 1) ^ d) ^ D :=
     Nat.pow_le_pow_left hq1 D
   have hform : ((S + 1) * (n + 1) ^ d) ^ D = (S + 1) ^ D * (n + 1) ^ (d * D) := by
