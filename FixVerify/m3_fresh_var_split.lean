@@ -52,8 +52,8 @@ theorem evalClause_cons_assign {z : var} {C : clause} (hC : ∀ l ∈ C, l.2 ≠
   induction C with
   | nil => rfl
   | cons l C ih =>
-      show evalLiteral (z :: a) l || evalClause (z :: a) C
-          = evalLiteral a l || evalClause a C
+      show (evalLiteral (z :: a) l || evalClause (z :: a) C)
+          = (evalLiteral a l || evalClause a C)
       rw [evalLiteral_cons_assign (hC l List.mem_cons_self) a,
         ih (fun l hl => hC l (List.mem_cons_of_mem _ hl))]
 
@@ -62,8 +62,8 @@ theorem evalClause_erase_assign {z : var} {C : clause} (hC : ∀ l ∈ C, l.2 �
   induction C with
   | nil => rfl
   | cons l C ih =>
-      show evalLiteral (a.erase z) l || evalClause (a.erase z) C
-          = evalLiteral a l || evalClause a C
+      show (evalLiteral (a.erase z) l || evalClause (a.erase z) C)
+          = (evalLiteral a l || evalClause a C)
       rw [evalLiteral_erase_assign (hC l List.mem_cons_self) a,
         ih (fun l hl => hC l (List.mem_cons_of_mem _ hl))]
 
@@ -72,8 +72,8 @@ theorem evalCnf_cons_assign {z : var} {N : cnf} (hN : ∀ E ∈ N, ∀ l ∈ E, 
   induction N with
   | nil => rfl
   | cons E N ih =>
-      show evalClause (z :: a) E && evalCnf (z :: a) N
-          = evalClause a E && evalCnf a N
+      show (evalClause (z :: a) E && evalCnf (z :: a) N)
+          = (evalClause a E && evalCnf a N)
       rw [evalClause_cons_assign (hN E List.mem_cons_self) a,
         ih (fun E hE => hN E (List.mem_cons_of_mem _ hE))]
 
@@ -82,8 +82,8 @@ theorem evalCnf_erase_assign {z : var} {N : cnf} (hN : ∀ E ∈ N, ∀ l ∈ E,
   induction N with
   | nil => rfl
   | cons E N ih =>
-      show evalClause (a.erase z) E && evalCnf (a.erase z) N
-          = evalClause a E && evalCnf a N
+      show (evalClause (a.erase z) E && evalCnf (a.erase z) N)
+          = (evalClause a E && evalCnf a N)
       rw [evalClause_erase_assign (hN E List.mem_cons_self) a,
         ih (fun E hE => hN E (List.mem_cons_of_mem _ hE))]
 
@@ -108,8 +108,8 @@ theorem evalClause_filter_assign {z : var} {C : clause} (hC : ∀ l ∈ C, l.2 �
   induction C with
   | nil => rfl
   | cons l C ih =>
-      show evalLiteral (a.filter (· ≠ z)) l || evalClause (a.filter (· ≠ z)) C
-          = evalLiteral a l || evalClause a C
+      show (evalLiteral (a.filter (· ≠ z)) l || evalClause (a.filter (· ≠ z)) C)
+          = (evalLiteral a l || evalClause a C)
       rw [evalLiteral_filter_assign (hC l List.mem_cons_self) a,
         ih (fun l hl => hC l (List.mem_cons_of_mem _ hl))]
 
@@ -118,8 +118,8 @@ theorem evalCnf_filter_assign {z : var} {N : cnf} (hN : ∀ E ∈ N, ∀ l ∈ E
   induction N with
   | nil => rfl
   | cons E N ih =>
-      show evalClause (a.filter (· ≠ z)) E && evalCnf (a.filter (· ≠ z)) N
-          = evalClause a E && evalCnf a N
+      show (evalClause (a.filter (· ≠ z)) E && evalCnf (a.filter (· ≠ z)) N)
+          = (evalClause a E && evalCnf a N)
       rw [evalClause_filter_assign (hN E List.mem_cons_self) a,
         ih (fun E hE => hN E (List.mem_cons_of_mem _ hE))]
 
