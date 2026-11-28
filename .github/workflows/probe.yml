@@ -1,0 +1,42 @@
+name: lean-env-probe
+on:
+  push:
+    branches: [inplace-verify]
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan + Lean v4.36.0
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan toolchain install leanprover/lean4:v4.36.0
+          elan default leanprover/lean4:v4.36.0
+          lake --version
+          lean --version
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Cache .lake
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: lake-v1-${{ runner.os }}-${{ hashFiles('lake-manifest.json', 'lean-toolchain') }}
+      - name: Mathlib cache get
+        run: lake exe cache get
+      - name: Report Mathlib provenance in .lake
+        run: |
+          echo "--- manifest pin ---"
+          grep -o '"rev": "[a-f0-9]*"' lake-manifest.json | head -5 || true
+          echo "--- mathlib checkout rev ---"
+          git -C .lake/packages/mathlib rev-parse HEAD || echo "NO_GIT_IN_MATHLIB_PKG"
+          echo "--- mathlib source check: mem_compl_iff ---"
+          grep -rn "theorem mem_compl_iff" .lake/packages/mathlib/Mathlib/Data/Set/Operations.lean || echo "LEMMA_NOT_IN_SOURCE"
+      - name: Build libraries (PvsNP + CookLevin)
+        run: lake build PvsNP CookLevin
+      - name: Run environment probe
+        run: |
+          lake env lean Probe.lean > probe-out.log 2>&1
+          echo "PROBE_EXIT=$?"
+          cat probe-out.log
+          echo "PROBE_DONE"
